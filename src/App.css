@@ -24,7 +24,6 @@ a {
   flex-flow: row wrap;
   width: 100%;
   justify-content: center;
-  margin: 2rem;
 }
 
 .container_cards {
