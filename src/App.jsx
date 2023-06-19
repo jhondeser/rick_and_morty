@@ -1,34 +1,53 @@
 import './App.css';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import Header from './components/Header/Header';
 
 function App() {
+  const [path, setPath] = useState('https://rickandmortyapi.com/api/character/?page=1')
   const [characters , setCharacters] = useState([]);
+  const [characterInfo, setCharactersInfo] = useState({});
+
   const [page_n, setPage_n] = useState(1);
 
+  
   useEffect(()=> {
     const fetchData = async ()=>{
       const result = await axios (
-        `https://rickandmortyapi.com/api/character/?page=${page_n}`
+        path
       )
       console.log(result);
       setCharacters(result.data.results)
+      setCharactersInfo(result.data.info)
+
+      console.log(characterInfo);
       console.log(characters);
-    
     }
     fetchData();
-  },[page_n])
+  },[path])
+
+  function update_next() {
+    setPage_n(page_n + 1);
+    setPath(characterInfo.next);
+  }
+
+  function update_prev() {
+    setPage_n(page_n - 1);
+    setPath(characterInfo.prev);
+  }
 
   function render_btn(page) {
-    if (page > 1 && page < 42) {
-      return <div>
-        <button onClick={()=> setPage_n(page - 1)}>prev</button>
-        <button onClick={()=> setPage_n(page + 1)}>next</button>
-      </div> 
-    } else if (page <= 1) {
-      return <button onClick={()=> setPage_n(page + 1)}>next</button>
-    } else if (page >= 42) {
-      return <button onClick={()=> setPage_n(page - 1)}>prev</button>
+    if (characterInfo.pages > 1) {
+      if (page > 1 && page < characterInfo.pages) {
+        return <div>
+          <button className='btn btn_prev' onClick={()=> update_prev()}>prev</button>
+          <button className='btn btn_next' onClick={()=> update_next()}>next</button>
+        </div> 
+      } else if (page <= 1) {
+        return  <button className='btn btn_next' onClick={()=> update_next()}>next</button>
+      } else if (page >= characterInfo.pages) {
+        return <button className='btn btn_prev' onClick={()=> update_prev()}>prev</button>
+      }
     }
   }
 
@@ -44,6 +63,11 @@ function App() {
 
   return (
     <div className="App">
+      <Header
+        setCharacters = {setCharacters}
+        setCharactersInfo = {setCharactersInfo}
+        setPage_n = {setPage_n}
+      />
       <div className="container_pj">
         {characters.map(el => (
           <div 
